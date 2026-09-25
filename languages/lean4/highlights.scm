@@ -58,6 +58,18 @@
 (explicit_binder
     type: (identifier) @type)
 
+;; Applied type expressions (for example `Option Foo` or `Array Pixel`)
+;; are represented as an `apply` node, so the bare-identifier rule above
+;; only highlights the atomic type case.
+(implicit_binder
+  type: (apply
+    name: (identifier) @type
+    arguments: (identifier) @type))
+(explicit_binder
+  type: (apply
+    name: (identifier) @type
+    arguments: (identifier) @type))
+
 ;; Binder names are values in scope, while their annotations are types.
 (implicit_binder
   name: (identifier) @variable)
