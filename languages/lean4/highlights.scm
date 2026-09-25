@@ -58,6 +58,26 @@
 (explicit_binder
     type: (identifier) @type)
 
+;; Binder names are values in scope, while their annotations are types.
+(implicit_binder
+  name: (identifier) @variable)
+(explicit_binder
+  name: (identifier) @variable)
+
+;; Local names. `let mut` has a distinct grammar node and stores its
+;; identifiers inside `parameters` rather than a `name` field.
+(let
+  name: (identifier) @variable)
+(let_mut
+  (parameters
+    (identifier) @variable))
+(let_bind
+  name: (identifier) @variable)
+(assign
+  name: (identifier) @variable)
+(for_in
+  (identifier) @variable)
+
 (proj
   name: (identifier) @field)
 
