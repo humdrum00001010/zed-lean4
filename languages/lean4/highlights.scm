@@ -35,8 +35,20 @@
   name: (identifier) @type)
 (def
   name: (identifier) @function)
+(def
+  type: (identifier) @type)
+(def
+  type: (apply
+    name: (identifier) @type
+    arguments: (identifier) @type))
 (theorem
   name: (identifier) @function)
+(theorem
+  type: (identifier) @type)
+(theorem
+  type: (apply
+    name: (identifier) @type
+    arguments: (identifier) @type))
 (constant
   name: (identifier) @type)
 (instance
@@ -209,12 +221,6 @@
   "simp"
   (trivial)
 ] @keyword
-
-[
-  "catch"
-  "finally"
-  "try"
-] @exception
 
 ((apply
   name: (identifier) @exception)
