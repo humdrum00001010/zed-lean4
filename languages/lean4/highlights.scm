@@ -106,6 +106,10 @@
 ;; Local names, including mutable bindings, share the `let` node.
 (let
   name: (identifier) @variable)
+(do_for
+  pattern: (identifier) @variable)
+(do_for_inline
+  pattern: (identifier) @variable)
 (block_assign
   name: (identifier) @variable)
 
@@ -115,6 +119,10 @@
 ["if" "then" "else"] @conditional
 
 ["for" "in" "do"] @repeat
+
+;; The grammar represents some do control words as identifiers.
+((identifier) @keyword
+  (#match? @keyword "^(return|break|continue)$"))
 
 (import
   name: (identifier) @module)
