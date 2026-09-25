@@ -12,8 +12,8 @@ name = "Lean4 Language Server"
 languages = ["Lean 4"]
 
 [grammars.lean]
-repository = "https://github.com/Julian/tree-sitter-lean"
-rev = "efe6b87145608d12f5996bd7f0cf6095a0e82261"
+repository = "https://github.com/humdrum00001010/tree-sitter-lean"
+rev = "824e3a3bb637f67c9b2bf8ff49cd10b8b911b8bc"
 
 [[capabilities]]
 kind = "process:exec"

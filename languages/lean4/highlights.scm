@@ -5,9 +5,6 @@
 (section
   name: (identifier) @namespace)
 
-(arrow) @type
-(product) @type
-
 ;; Declarations
 
 [
@@ -38,17 +35,17 @@
 (def
   type: (identifier) @type)
 (def
-  type: (apply
-    name: (identifier) @type
-    arguments: (identifier) @type))
+  type: (app
+    fn: (identifier) @type
+    arg: (identifier) @type))
 (theorem
   name: (identifier) @function)
 (theorem
   type: (identifier) @type)
 (theorem
-  type: (apply
-    name: (identifier) @type
-    arguments: (identifier) @type))
+  type: (app
+    fn: (identifier) @type
+    arg: (identifier) @type))
 (constant
   name: (identifier) @type)
 (instance
@@ -59,28 +56,46 @@
   name: (identifier) @function)
 (structure
   name: (identifier) @type)
-(structure
-  extends: (identifier) @type)
-
-(where_decl
-  type: (identifier) @type)
-
 (implicit_binder
     type: (identifier) @type)
 (explicit_binder
     type: (identifier) @type)
 
 ;; Applied type expressions (for example `Option Foo` or `Array Pixel`)
-;; are represented as an `apply` node, so the bare-identifier rule above
+;; are represented as an `app` node, so the bare-identifier rule above
 ;; only highlights the atomic type case.
 (implicit_binder
-  type: (apply
-    name: (identifier) @type
-    arguments: (identifier) @type))
+  type: (app
+    fn: (identifier) @type
+    arg: (identifier) @type))
 (explicit_binder
-  type: (apply
-    name: (identifier) @type
-    arguments: (identifier) @type))
+  type: (app
+    fn: (identifier) @type
+    arg: (identifier) @type))
+
+;; Function types are right-associated binary operators. Highlight each
+;; named type leaf in the binder's arrow chain.
+(explicit_binder
+  type: (binary_op
+    lhs: (identifier) @type))
+(explicit_binder
+  type: (binary_op
+    rhs: (identifier) @type))
+(explicit_binder
+  type: (binary_op
+    lhs: (app
+      fn: (identifier) @type
+      arg: (identifier) @type)))
+(explicit_binder
+  type: (binary_op
+    rhs: (app
+      fn: (identifier) @type
+      arg: (identifier) @type)))
+(explicit_binder
+  type: (binary_op
+    rhs: (binary_op
+      lhs: (identifier) @type
+      rhs: (identifier) @type)))
 
 ;; Binder names are values in scope, while their annotations are types.
 (implicit_binder
@@ -88,81 +103,40 @@
 (explicit_binder
   name: (identifier) @variable)
 
-;; Local names. `let mut` has a distinct grammar node and stores its
-;; identifiers inside `parameters` rather than a `name` field.
+;; Local names, including mutable bindings, share the `let` node.
 (let
   name: (identifier) @variable)
-(let_mut
-  (parameters
-    (identifier) @variable))
-(let_bind
+(block_assign
   name: (identifier) @variable)
-(assign
-  name: (identifier) @variable)
-(for_in
-  (identifier) @variable)
 
 (proj
-  name: (identifier) @field)
-
-(binders
-  type: (identifier) @type)
+  field: (identifier) @field)
 
 ["if" "then" "else"] @conditional
 
 ["for" "in" "do"] @repeat
 
 (import
-  module: (identifier) @module)
+  name: (identifier) @module)
 
 ; Tokens
 
 [
-  "!"
-  "$"
-  "%"
-  "&&"
-  "*"
-  "*>"
-  "+"
-  "++"
-  "-"
-  "/"
-  "::"
-  ":="
-  "<"
-  "<$>"
-  "<*"
-  "<*>"
-  "<="
-  "<|"
-  "<|>"
-  "="
-  "=="
-  "=>"
-  ">"
-  ">"
-  ">="
-  ">>"
-  ">>="
-  "@"
-  "^"
-  "|>"
-  "|>."
-  "||"
-  "←"
-  "→"
-  "↔"
-  "∘"
-  "∧"
-  "∨"
-  "≠"
-  "≤"
-  "≥"
-] @operator
-
-[
-  "@&"
+  "→" "->" "↔" "<->" "↦" "=>"
+  "∨" "||" "∧" "&&" "¬" "!"
+  "=" "≠" "!=" "<" "≤" "<=" ">" "≥" ">="
+  "∈" "∉" "⊆" "⊂" "⊇" "⊃"
+  "≡" "≢" "~" "≃" "≅"
+  "::" "++"
+  "+" "-" "*" "/" "%"
+  "∪" "∩" "\\"
+  "^" "∘"
+  "|>" "<|"
+  ">>" "<<" ">>>" "<<<"
+  ">>=" "=<<"
+  "<$>" "<*>" "<|>" "<&>"
+  "&&&" "|||" "^^^"
+  "←" "<-"
 ] @operator
 
 [
@@ -186,7 +160,6 @@
   "where"
   "with"
   "λ"
-  (hash_command)
   (prelude)
   (sorry)
 ] @keyword
@@ -201,7 +174,6 @@
   "macro"
   "macro_rules"
   "syntax"
-  "elab"
   "builtin_initialize"
 ] @keyword
 
@@ -213,41 +185,23 @@
   "unsafe"
 ] @keyword.modifier
 
-[
-  "apply"
-  "exact"
-  "rewrite"
-  "rw"
-  "simp"
-  (trivial)
-] @keyword
-
-((apply
-  name: (identifier) @exception)
+((app
+  fn: (identifier) @exception)
  (#match? @exception "throw"))
 
-[
-  "unless"
-  "mut"
-] @keyword
+[(true_const) (false_const)] @boolean
 
-[(true) (false)] @boolean
+(num_lit) @number
+(scientific_lit) @number.float
 
-(number) @number
-(float) @number.float
-
-(comment) @comment
-(char) @character
-(string) @string
-(interpolated_string) @string
-(quoted_char) @string.escape
-
-; Reset highlighing in string interpolation
-(interpolation) @none
-
-(interpolation
-  "{" @punctuation.special
-  "}" @punctuation.special)
+(line_comment) @comment
+(block_comment) @comment
+(doc_comment) @comment.documentation
+(module_doc_comment) @comment.documentation
+(char_lit) @character
+(str_lit) @string
+(interpolated_str) @string
+(escape_sequence) @string.escape
 
 [
   "(" ")"
